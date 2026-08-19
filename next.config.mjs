@@ -3,8 +3,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@react-pdf/renderer"],
   },
-  webpack: (config) => {
-    config.resolve.alias.canvas = false;
+  webpack: (config, { nextRuntime }) => {
+    // @react-pdf/renderer optional dep. Do not apply this alias to Edge
+    // middleware — a boolean alias can crash the Vercel middleware isolate.
+    if (nextRuntime !== "edge") {
+      config.resolve.alias.canvas = false;
+    }
     return config;
   },
   async redirects() {
