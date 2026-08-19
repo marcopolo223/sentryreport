@@ -1,8 +1,20 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getSupabasePublicEnv } from "@/lib/supabase/public-env";
-
 const PUBLIC_PATHS = new Set(["/", "/login", "/signup", "/privacy", "/terms"]);
+
+function supabasePublicEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(
+    /^['"]|['"]$/g,
+    ""
+  );
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim().replace(
+    /^['"]|['"]$/g,
+    ""
+  );
+  if (!url || !key || !/^https?:\/\//i.test(url)) return null;
+  return { url, key };
+}
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -14,7 +26,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const env = getSupabasePublicEnv();
+  const env = supabasePublicEnv();
   if (!env) {
     return gateAsLoggedOut(request, path);
   }
@@ -42,7 +54,6 @@ async function refreshSessionAndGate(
   path: string,
   env: { url: string; key: string }
 ) {
-  const { createServerClient } = await import("@supabase/ssr");
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(env.url, env.key, {
