@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import { AmbientBackground } from "@/components/ambient-background";
+import { AuthRefresh } from "@/components/auth-refresh";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getAppUrl } from "@/lib/app-url";
 import { cn } from "@/lib/utils";
@@ -68,6 +69,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AmbientBackground />
+          <AuthRefresh />
           {children}
         </ThemeProvider>
       </body>
